@@ -2,7 +2,7 @@
 //  PaywallViewController.swift
 //  SpotifyPaywall
 //
-//  Created by joonwon lee on 2022/04/30.
+//  Created by tony yun on 2023/10/12.
 //
 
 import UIKit
@@ -58,6 +58,9 @@ class PaywallViewController: UIViewController {
         // layout: compositional layout
         collectionView.collectionViewLayout = layout()
         
+        // 수평이어도 위아래 스크롤 가능 현상 방지
+        collectionView.alwaysBounceVertical = false
+        
     }
     private func layout() -> UICollectionViewCompositionalLayout {
         
@@ -72,16 +75,15 @@ class PaywallViewController: UIViewController {
         section.orthogonalScrollingBehavior = .groupPagingCentered
         section.interGroupSpacing = 20
         
+        // page control 계산
+        section.visibleItemsInvalidationHandler = { (item, offset, env) in
+            // 상황에 따라 다르게 계산해야 할수도 있음.
+            let index = Int((offset.x / env.container.contentSize.width).rounded(.up))
+            self.pageControl.currentPage = index
+        }
+        
         let layout = UICollectionViewCompositionalLayout(section: section)
         return layout
     }
 }
 
-// page control 설정
-extension PaywallViewController: UIScrollViewDelegate {
-    
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        let index = Int(scrollView.contentOffset.x / self.collectionView.bounds.width)
-        pageControl.currentPage = index
-    }
-}
